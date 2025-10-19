@@ -15,3 +15,6 @@ Everything is designed to be **seamless, responsive, and distraction-free**.
 ## How We Chose It  
 We wanted to reimagine online learning from a student’s perspective — focused, elegant, and genuinely useful.  
 Scholia keeps only what matters: **clarity, speed, and meaningful progress.**
+
+## Video pitch
+[**Link to video pitch file**](video-pitch.mp4)
