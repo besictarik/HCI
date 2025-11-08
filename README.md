@@ -7,7 +7,7 @@
 
 ## Project Structure
 
-- **`/`**: The source code of project
+- **`/code`**: The source code of project
 - **`/assignments`**: Results of assignments
 - **`/docs`**: Project documentation
 
