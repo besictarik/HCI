@@ -17,9 +17,6 @@ const Card = ({ article }: { article: Article }) => {
         <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-2">
           {article.title}
         </h3>
-        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-          {article.excerpt}
-        </p>
         <div className="mt-auto pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground">By {article.author}</p>
         </div>

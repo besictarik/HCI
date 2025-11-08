@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CheckCircle2, ChevronRight, Play } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Course, CourseContent } from "@/lib/data/courses/types";
 
 const Sidebar = ({
