@@ -15,7 +15,7 @@
 
 ### Semester Project
 
-- Link to your production version: [**Production Version**](URL_TO_PRODUCTION_VERSION) <!-- Replace with actual URL -->
+- Link to your production version: [**Production Version**](https://hci-lana-tarik.vercel.app) <!-- Replace with actual URL -->
 - Link to your final report: [**Final Report**](URL_TO_FINAL_REPORT) <!-- Replace with actual URL -->
 <!-- Add more as necessary -->
 
@@ -23,5 +23,5 @@
 
 - Link to Assignment 1: [**Assignment 1**](/assignments/first-assignment/written-summary.md) <!-- Replace with actual URL -->
 - Link to Assignment 2: [**Assignment 2**](/assignments/second-assignment/user-personas-and-information-architecture.md) <!-- Replace with actual URL -->
-- Link to Assignment 3: [**Assignment 3**](URL_TO_ASSIGNMENT_3) <!-- Replace with actual URL -->
+- Link to Assignment 3: [**Assignment 3**](/assignments/third-assignment/nextjs-deploying-application.md) <!-- Replace with actual URL -->
 <!-- Add more assignments as necessary -->
