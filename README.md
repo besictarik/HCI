@@ -24,4 +24,6 @@
 - Link to Assignment 1: [**Assignment 1**](/assignments/first-assignment/written-summary.md) <!-- Replace with actual URL -->
 - Link to Assignment 2: [**Assignment 2**](/assignments/second-assignment/user-personas-and-information-architecture.md) <!-- Replace with actual URL -->
 - Link to Assignment 3: [**Assignment 3**](/assignments/third-assignment/nextjs-deploying-application.md) <!-- Replace with actual URL -->
+- Link to Assignment 4: [**Assignment 4**](/assignments/fourth-assignment/low-high-fidelity-prototype.md) <!-- Replace with actual URL -->
+- Link to Assignment 5: [**Assignment 5**](/assignments/fifth-assignment/nextjs-dynamic-routes-data-fetching.md) <!-- Replace with actual URL -->
 <!-- Add more assignments as necessary -->
