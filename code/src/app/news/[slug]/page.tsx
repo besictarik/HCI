@@ -8,9 +8,9 @@ export const generateStaticParams = async () => {
   }));
 };
 
-const Page = async ({ params }: { params: { slug: string } }) => {
+const Page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   // Renamed temporary to ID to satisfy placeholder API
-  const { slug: id } = params;
+  const { slug: id } = await params;
   const article = await getArticle(id);
   return (
     <>
