@@ -26,4 +26,6 @@
 - Link to Assignment 3: [**Assignment 3**](/assignments/third-assignment/nextjs-deploying-application.md) <!-- Replace with actual URL -->
 - Link to Assignment 4: [**Assignment 4**](/assignments/fourth-assignment/low-high-fidelity-prototype.md) <!-- Replace with actual URL -->
 - Link to Assignment 5: [**Assignment 5**](/assignments/fifth-assignment/nextjs-dynamic-routes-data-fetching.md) <!-- Replace with actual URL -->
+- Link to Assignment 6: [**Assignment 6**](/assignments/sixth-assignment/full-responsive-page-coding.md) <!-- Replace with actual URL -->
+
 <!-- Add more assignments as necessary -->
