@@ -1,4 +1,5 @@
 import { getPayload } from "payload";
+import { unstable_cache } from "next/cache";
 import config from "@/payload.config";
 import { Course } from "@/lib/data/courses/types";
 
@@ -35,7 +36,7 @@ const resolveMediaUrl = (value: unknown) => {
   return typeof url === "string" && url.length > 0 ? url : undefined;
 };
 
-export const getCourse = async (slug: string): Promise<Course | null> => {
+const queryCourse = async (slug: string): Promise<Course | null> => {
   const payload = await getPayload({ config: await config });
 
   const { docs } = await payload.find({
@@ -86,4 +87,12 @@ export const getCourse = async (slug: string): Promise<Course | null> => {
         .filter((value): value is string => Boolean(value)) || [],
     imageUrl: resolveMediaUrl(course.coverImage),
   };
+};
+
+export const getCourse = async (slug: string): Promise<Course | null> => {
+  const getCourseCached = unstable_cache(() => queryCourse(slug), [`course:${slug}`], {
+    tags: ["courses", `course:${slug}`],
+  });
+
+  return getCourseCached();
 };

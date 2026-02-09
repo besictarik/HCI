@@ -1,25 +1,18 @@
-import { headers as getHeaders } from "next/headers";
-import { redirect } from "next/navigation";
-import { getPayload } from "payload";
-import config from "@/payload.config";
+import { Suspense } from "react";
 import Hero from "./_components/Hero";
+import HeroSkeleton from "./_components/Hero/Skeleton";
 import CoursesGrid from "./_components/CoursesGrid";
+import CoursesGridSkeleton from "./_components/CoursesGrid/Skeleton";
 
-const Page = async () => {
-  const headers = await getHeaders();
-  const payload = await getPayload({ config: await config });
-  const { user } = await payload.auth({ headers });
-  const isCustomer =
-    (user as { collection?: string } | null)?.collection === "customers";
-
-  if (!isCustomer) {
-    redirect("/login?redirect=%2Faccount");
-  }
-
+const Page = () => {
   return (
     <>
-      <Hero />
-      <CoursesGrid />
+      <Suspense fallback={<HeroSkeleton />}>
+        <Hero />
+      </Suspense>
+      <Suspense fallback={<CoursesGridSkeleton />}>
+        <CoursesGrid />
+      </Suspense>
     </>
   );
 };

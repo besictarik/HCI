@@ -1,4 +1,5 @@
 import { getPayload } from "payload";
+import { unstable_cache } from "next/cache";
 import config from "@/payload.config";
 import { CourseContent } from "@/lib/data/courses/types";
 
@@ -20,7 +21,7 @@ type CourseDoc = {
   contentModules?: ModuleDoc[] | null;
 };
 
-export const getCourseContent = async (
+const queryCourseContent = async (
   slug: string
 ): Promise<CourseContent | null> => {
   const payload = await getPayload({ config: await config });
@@ -68,4 +69,18 @@ export const getCourseContent = async (
     title: course.title || "Untitled Course",
     modules,
   };
+};
+
+export const getCourseContent = async (
+  slug: string
+): Promise<CourseContent | null> => {
+  const getCourseContentCached = unstable_cache(
+    () => queryCourseContent(slug),
+    [`course-content:${slug}`],
+    {
+      tags: ["courses", `course:${slug}`, `course-content:${slug}`],
+    }
+  );
+
+  return getCourseContentCached();
 };

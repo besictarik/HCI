@@ -6,9 +6,6 @@ import { getPayload } from "payload";
 import config from "@/payload.config";
 import { hasCourseEnrollment } from "@/lib/data/enrollments";
 
-const getLearnPath = (slug: string, lessonId: string) =>
-  `/course/${slug}/learn?lesson=${encodeURIComponent(lessonId)}`;
-
 type ToggleProgressParams = {
   courseId: number | string;
   courseSlug: string;
@@ -37,7 +34,9 @@ export const toggleLessonProgressAction = async ({
     "customers";
 
   if (!isCustomer || !user?.id) {
-    redirect(`/login?redirect=${encodeURIComponent(getLearnPath(courseSlug, lessonId))}`);
+    redirect(
+      `/login?redirect=${encodeURIComponent(`/course/${courseSlug}/learn?lesson=${lessonId}`)}`
+    );
   }
 
   const isEnrolled = await hasCourseEnrollment({
@@ -97,6 +96,4 @@ export const toggleLessonProgressAction = async ({
       id: existing.id,
     });
   }
-
-  redirect(getLearnPath(courseSlug, lessonId));
 };

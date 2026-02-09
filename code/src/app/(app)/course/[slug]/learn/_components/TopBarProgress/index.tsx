@@ -1,21 +1,12 @@
-import { getCompletedLessonsForCourse } from "@/lib/data/progress";
-
 type TopBarProgressProps = {
-  customerId: number | string;
-  courseId: number | string;
+  completedCount: number;
   totalLessons: number;
 };
 
-const TopBarProgress = async ({
-  customerId,
-  courseId,
+const TopBarProgress = ({
+  completedCount,
   totalLessons,
 }: TopBarProgressProps) => {
-  const completedLessonIds = await getCompletedLessonsForCourse({
-    customerId,
-    courseId,
-  });
-  const completedCount = completedLessonIds.length;
   const progressPercent = totalLessons
     ? Math.round((completedCount / totalLessons) * 100)
     : 0;

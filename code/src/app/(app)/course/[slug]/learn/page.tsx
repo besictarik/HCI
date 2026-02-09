@@ -1,16 +1,12 @@
 import Sidebar from "./_components/Sidebar";
 import { getCourse, getCourseContent } from "@/lib/data/courses";
-import { headers as getHeaders } from "next/headers";
-import { getPayload } from "payload";
-import config from "@/payload.config";
-import { hasCourseEnrollment } from "@/lib/data/enrollments";
+import { getCurrentCustomer } from "@/lib/auth/getCurrentCustomer";
 import { getCompletedLessonsForCourse } from "@/lib/data/progress";
 import { Suspense } from "react";
 import LessonContentPanel from "./_components/LessonContentPanel";
 import LessonContentSkeleton from "./_components/LessonContentSkeleton";
 import TopBarProgress from "./_components/TopBarProgress";
-import { Skeleton } from "@/ui/skeleton";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 const Page = async ({
   params,
@@ -21,30 +17,12 @@ const Page = async ({
 }) => {
   const { slug } = await params;
   const { lesson } = await searchParams;
-  const headers = await getHeaders();
-  const payload = await getPayload({ config: await config });
-  const { user } = await payload.auth({ headers });
-  const isCustomer =
-    (user as { collection?: string; id?: number | string } | null)?.collection ===
-    "customers";
+  const customer = await getCurrentCustomer();
+  const customerId = customer?.id;
   const course = await getCourse(slug);
 
   if (!course) {
     notFound();
-  }
-
-  if (!isCustomer || !user?.id) {
-    redirect(`/login?redirect=${encodeURIComponent(`/course/${slug}/learn`)}`);
-  }
-
-  const isEnrolled = await hasCourseEnrollment({
-    customerId: user.id,
-    courseId: course.id,
-    payload,
-  });
-
-  if (!isEnrolled) {
-    redirect(`/course/${slug}`);
   }
 
   const courseContent = await getCourseContent(slug);
@@ -67,11 +45,17 @@ const Page = async ({
   const selectedLesson =
     lessons.find((currentLesson) => currentLesson.id === lesson) || firstLesson;
   const totalLessons = lessons.length;
+
+  if (!customerId) {
+    // Access is already guarded in learn/layout.tsx.
+    notFound();
+  }
+
   const completedLessonIds = await getCompletedLessonsForCourse({
-    customerId: user.id,
+    customerId,
     courseId: course.id,
-    payload,
   });
+  const completedCount = completedLessonIds.length;
 
   return (
     <div className="w-full flex h-[calc(100vh-65px)]">
@@ -94,28 +78,16 @@ const Page = async ({
               </h1>
             </div>
           </div>
-          <Suspense
-            fallback={
-              <div className="w-44 hidden sm:block space-y-1">
-                <Skeleton className="h-3 w-24" />
-                <Skeleton className="h-2 w-full" />
-              </div>
-            }
-          >
-            <TopBarProgress
-              customerId={user.id}
-              courseId={course.id}
-              totalLessons={totalLessons}
-            />
-          </Suspense>
+          <TopBarProgress completedCount={completedCount} totalLessons={totalLessons} />
         </div>
         <Suspense key={selectedLesson.id} fallback={<LessonContentSkeleton />}>
           <LessonContentPanel
             courseId={course.id}
             courseSlug={slug}
-            customerId={user.id}
+            customerId={customerId}
             courseContent={courseContent}
             selectedLessonId={selectedLesson.id}
+            completedLessonIds={completedLessonIds}
           />
         </Suspense>
       </div>

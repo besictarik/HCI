@@ -1,5 +1,6 @@
 import type { CollectionConfig } from "payload";
 import { authenticated } from "@/access";
+import { revalidateTag } from "next/cache";
 
 const slugify = (value: string) =>
   value
@@ -30,6 +31,36 @@ export const Courses: CollectionConfig = {
   admin: {
     useAsTitle: "title",
     defaultColumns: ["title", "category", "level", "price", "status"],
+  },
+  hooks: {
+    afterChange: [
+      async ({ doc, previousDoc }) => {
+        revalidateTag("courses");
+        const slug = typeof doc?.slug === "string" ? doc.slug : null;
+        const prevSlug =
+          previousDoc && typeof previousDoc.slug === "string"
+            ? previousDoc.slug
+            : null;
+
+        if (slug) {
+          revalidateTag(`course:${slug}`);
+        }
+
+        if (prevSlug && prevSlug !== slug) {
+          revalidateTag(`course:${prevSlug}`);
+        }
+      },
+    ],
+    afterDelete: [
+      async ({ doc }) => {
+        revalidateTag("courses");
+        const slug = typeof doc?.slug === "string" ? doc.slug : null;
+
+        if (slug) {
+          revalidateTag(`course:${slug}`);
+        }
+      },
+    ],
   },
   fields: [
     {

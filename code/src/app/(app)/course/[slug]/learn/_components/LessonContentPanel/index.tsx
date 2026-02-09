@@ -1,5 +1,4 @@
 import { CourseContent } from "@/lib/data/courses/types";
-import { getCompletedLessonsForCourse } from "@/lib/data/progress";
 import { toggleLessonProgressAction } from "../../actions";
 import LessonProgressToggle from "../LessonProgressToggle";
 import { notFound } from "next/navigation";
@@ -10,14 +9,16 @@ type LessonContentPanelProps = {
   customerId: number | string;
   courseContent: CourseContent;
   selectedLessonId: string;
+  completedLessonIds: string[];
 };
 
-const LessonContentPanel = async ({
+const LessonContentPanel = ({
   courseId,
   courseSlug,
   customerId,
   courseContent,
   selectedLessonId,
+  completedLessonIds,
 }: LessonContentPanelProps) => {
   const lessons = courseContent.modules.flatMap((module) => module.lessons);
   const selectedLesson = lessons.find((lesson) => lesson.id === selectedLessonId);
@@ -29,10 +30,6 @@ const LessonContentPanel = async ({
   const selectedModule = courseContent.modules.find((module) =>
     module.lessons.some((lesson) => lesson.id === selectedLesson.id)
   );
-  const completedLessonIds = await getCompletedLessonsForCourse({
-    customerId,
-    courseId,
-  });
   const completedSet = new Set(completedLessonIds);
   const isSelectedLessonCompleted = completedSet.has(selectedLesson.id);
   const markLessonComplete = toggleLessonProgressAction.bind(null, {
