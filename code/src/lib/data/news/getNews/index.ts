@@ -1,19 +1,53 @@
+import { getPayload } from "payload";
+import { unstable_cache } from "next/cache";
+import config from "@/payload.config";
 import { Article } from "@/lib/data/news/types";
+import { formatArticleDate, lexicalToText, resolveMediaUrl } from "../helpers";
+
+type ArticleDoc = {
+  id: number | string;
+  slug?: string | null;
+  title?: string | null;
+  category?: string | null;
+  excerpt?: string | null;
+  authorName?: string | null;
+  publishedAt?: string | null;
+  content?: unknown;
+  coverImage?: unknown;
+};
+
+const queryNews = async (): Promise<Article[]> => {
+  const payload = (await getPayload({ config: await config })) as any;
+
+  const { docs } = await payload.find({
+    collection: "articles",
+    where: {
+      status: {
+        equals: "published",
+      },
+    },
+    sort: "-publishedAt",
+    limit: 50,
+    depth: 1,
+  });
+
+  return (docs as ArticleDoc[]).map((article) => ({
+    id: article.id,
+    slug: article.slug || String(article.id),
+    title: article.title || "Untitled Article",
+    category: article.category || "General",
+    date: formatArticleDate(article.publishedAt),
+    excerpt: article.excerpt || "",
+    author: article.authorName || "Scholia Team",
+    content: lexicalToText(article.content),
+    imageUrl: resolveMediaUrl(article.coverImage),
+  }));
+};
+
+const getNewsCached = unstable_cache(queryNews, ["articles:list"], {
+  tags: ["articles"],
+});
 
 export const getNews = async (): Promise<Article[]> => {
-  const BASE_URL = "https://jsonplaceholder.typicode.com/posts";
-  const res = await fetch(`${BASE_URL}`);
-  const posts = await res.json();
-
-  return posts.map((post: { id: string; title: string; content: string }) => ({
-    id: post.id,
-    slug: "new-ai-powered-learning-features-released",
-    title: post.title,
-    category: "Product",
-    date: "November 4, 2025",
-    excerpt:
-      "We're excited to announce new AI features that personalize your learning experience based on your progress and learning style.",
-    author: "Sarah Chen",
-    content: post.content,
-  }));
+  return getNewsCached();
 };
