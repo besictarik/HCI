@@ -10,6 +10,7 @@ import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
 import { Customers } from "./collections/Customers";
 import { Articles } from "./collections/Articles";
+import { Home } from "./globals/Home";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -22,6 +23,7 @@ export default buildConfig({
     },
   },
   collections: [Users, Customers, Media, Articles],
+  globals: [Home],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
