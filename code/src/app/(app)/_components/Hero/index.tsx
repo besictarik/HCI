@@ -19,10 +19,10 @@ const Hero = ({
   secondaryCtaHref,
 }: HeroProps) => {
   return (
-    <section className="relative min-h-[calc(100vh-65px)] bg-black flex items-center">
+    <section className="relative min-h-[calc(100vh-65px)] bg-gradient-to-br from-primary/10 to-accent/10 flex items-center">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 text-balance">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 text-balance">
             {title}
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto text-balance">
@@ -35,11 +35,7 @@ const Hero = ({
               </Button>
             </Link>
             <Link href={secondaryCtaHref}>
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full sm:w-auto bg-white"
-              >
+              <Button size="lg" variant="outline" className="w-full sm:w-auto">
                 {secondaryCtaLabel}
               </Button>
             </Link>

@@ -2,7 +2,7 @@ import { getEnrolledCourses } from "@/lib/data/courses";
 import { getCurrentCustomer } from "@/lib/auth/getCurrentCustomer";
 import { Button } from "@/ui/button";
 import Link from "next/link";
-import Card from "./Card";
+import CourseCard from "../../../_components/CourseCard";
 
 const CoursesGrid = async () => {
   const customer = await getCurrentCustomer();
@@ -54,7 +54,7 @@ const CoursesGrid = async () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {courses.map((course) => (
               <Link key={course.id} href={`/course/${course.slug}/learn`}>
-                <Card course={course} />
+                <CourseCard course={course} />
               </Link>
             ))}
           </div>

@@ -21,7 +21,7 @@ const Hero = ({ course, isCustomer, isEnrolled }: HeroProps) => {
 
   return (
     <section className="py-12 md:py-16 bg-gradient-to-br from-primary/10 to-accent/10">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-8 lg:grid-cols-2 lg:items-center">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-8 lg:grid-cols-2 lg:items-start">
         <div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <Link href="/courses" className="hover:text-foreground">
