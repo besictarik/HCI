@@ -1,8 +1,10 @@
 import { getPayload } from "payload";
 import fs from "node:fs";
 import path from "node:path";
-import { loadEnvConfig } from "@next/env";
+import { createRequire } from "node:module";
 
+const require = createRequire(import.meta.url);
+const { loadEnvConfig } = require("@next/env");
 loadEnvConfig(process.cwd());
 
 type SeedArticle = {

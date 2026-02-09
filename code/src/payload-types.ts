@@ -72,6 +72,9 @@ export interface Config {
     customers: Customer;
     media: Media;
     articles: Article;
+    courses: Course;
+    enrollments: Enrollment;
+    'lesson-progress': LessonProgress;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -83,6 +86,9 @@ export interface Config {
     customers: CustomersSelect<false> | CustomersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    courses: CoursesSelect<false> | CoursesSelect<true>;
+    enrollments: EnrollmentsSelect<false> | EnrollmentsSelect<true>;
+    'lesson-progress': LessonProgressSelect<false> | LessonProgressSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -249,6 +255,77 @@ export interface Article {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courses".
+ */
+export interface Course {
+  id: number;
+  title: string;
+  slug: string;
+  category: string;
+  level: string;
+  duration: string;
+  instructor: string;
+  price: number;
+  rating: number;
+  students: number;
+  reviews: number;
+  description: string;
+  fullDescription: string;
+  instructorBio: string;
+  prerequisites: string;
+  learnings: {
+    value: string;
+    id?: string | null;
+  }[];
+  contentModules?:
+    | {
+        title: string;
+        lessons?:
+          | {
+              title: string;
+              duration: string;
+              description?: string | null;
+              completed?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  coverImage?: (number | null) | Media;
+  status: 'draft' | 'published';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enrollments".
+ */
+export interface Enrollment {
+  id: number;
+  customer: number | Customer;
+  course: number | Course;
+  status: 'active' | 'cancelled';
+  acquiredAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lesson-progress".
+ */
+export interface LessonProgress {
+  id: number;
+  customer: number | Customer;
+  course: number | Course;
+  lessonId: string;
+  uniqueKey: string;
+  completedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -286,6 +363,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'articles';
         value: number | Article;
+      } | null)
+    | ({
+        relationTo: 'courses';
+        value: number | Course;
+      } | null)
+    | ({
+        relationTo: 'enrollments';
+        value: number | Enrollment;
+      } | null)
+    | ({
+        relationTo: 'lesson-progress';
+        value: number | LessonProgress;
       } | null);
   globalSlug?: string | null;
   user:
@@ -416,6 +505,76 @@ export interface ArticlesSelect<T extends boolean = true> {
   authorName?: T;
   publishedAt?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "courses_select".
+ */
+export interface CoursesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  category?: T;
+  level?: T;
+  duration?: T;
+  instructor?: T;
+  price?: T;
+  rating?: T;
+  students?: T;
+  reviews?: T;
+  description?: T;
+  fullDescription?: T;
+  instructorBio?: T;
+  prerequisites?: T;
+  learnings?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  contentModules?:
+    | T
+    | {
+        title?: T;
+        lessons?:
+          | T
+          | {
+              title?: T;
+              duration?: T;
+              description?: T;
+              completed?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  coverImage?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "enrollments_select".
+ */
+export interface EnrollmentsSelect<T extends boolean = true> {
+  customer?: T;
+  course?: T;
+  status?: T;
+  acquiredAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lesson-progress_select".
+ */
+export interface LessonProgressSelect<T extends boolean = true> {
+  customer?: T;
+  course?: T;
+  lessonId?: T;
+  uniqueKey?: T;
+  completedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

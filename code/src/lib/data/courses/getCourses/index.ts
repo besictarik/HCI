@@ -1,46 +1,59 @@
-export const getCourses = () => {
-  return [
-    {
-      id: 1,
-      slug: "web-development-fundamentals",
-      title: "Web Development Fundamentals",
-      category: "Web Development",
-      instructor: "John Smith",
-      price: 49,
-      rating: 4.8,
-      students: 2500,
-      description:
-        "Master the essential skills needed to build modern web applications with hands-on projects.",
-      level: "Beginner",
-      duration: "8 weeks",
+import { getPayload } from "payload";
+import config from "@/payload.config";
+import { CoursePreview } from "@/lib/data/courses/types";
+
+type CourseDoc = {
+  id: number | string;
+  slug?: string | null;
+  title?: string | null;
+  category?: string | null;
+  instructor?: string | null;
+  price?: number | null;
+  rating?: number | null;
+  students?: number | null;
+  description?: string | null;
+  level?: string | null;
+  duration?: string | null;
+  coverImage?: unknown;
+  status?: "draft" | "published" | null;
+};
+
+const resolveMediaUrl = (value: unknown) => {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+
+  const url = (value as { url?: string }).url;
+  return typeof url === "string" && url.length > 0 ? url : undefined;
+};
+
+export const getCourses = async (): Promise<CoursePreview[]> => {
+  const payload = await getPayload({ config: await config });
+
+  const { docs } = await payload.find({
+    collection: "courses",
+    where: {
+      status: {
+        equals: "published",
+      },
     },
-    {
-      id: 2,
-      slug: "advanced-javascript",
-      title: "Advanced JavaScript",
-      category: "Programming",
-      instructor: "Sarah Johnson",
-      price: 59,
-      rating: 4.9,
-      students: 1800,
-      description:
-        "Deep dive into advanced JavaScript concepts and master asynchronous programming.",
-      level: "Intermediate",
-      duration: "10 weeks",
-    },
-    {
-      id: 3,
-      slug: "react-and-nextjs-mastery",
-      title: "React & Next.js Mastery",
-      category: "Web Development",
-      instructor: "Mike Chen",
-      price: 69,
-      rating: 4.7,
-      students: 3200,
-      description:
-        "Learn to build production-ready React applications with Next.js framework.",
-      level: "Intermediate",
-      duration: "12 weeks",
-    },
-  ];
+    sort: "title",
+    limit: 100,
+    depth: 1,
+  });
+
+  return (docs as CourseDoc[]).map((course) => ({
+    id: course.id,
+    slug: course.slug || String(course.id),
+    title: course.title || "Untitled Course",
+    category: course.category || "General",
+    instructor: course.instructor || "Scholia Team",
+    price: course.price ?? 0,
+    rating: course.rating ?? 0,
+    students: course.students ?? 0,
+    description: course.description || "",
+    level: course.level || "Beginner",
+    duration: course.duration || "N/A",
+    imageUrl: resolveMediaUrl(course.coverImage),
+  }));
 };

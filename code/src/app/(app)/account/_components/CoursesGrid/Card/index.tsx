@@ -1,10 +1,20 @@
 import { CoursePreview } from "@/lib/data/courses/types";
+import Image from "next/image";
 
 const Card = ({ course }: { course: CoursePreview }) => {
   return (
     <div className="group rounded-lg border border-border bg-card h-full hover:shadow-lg transition-all duration-300 hover:border-primary overflow-hidden flex flex-col">
-      <div className="h-48 bg-black flex items-center justify-center text-muted-foreground">
-        Course Image
+      <div className="h-48 relative bg-black flex items-center justify-center text-muted-foreground">
+        {course.imageUrl ? (
+          <Image
+            src={course.imageUrl}
+            alt={course.title}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          "Course Image"
+        )}
       </div>
       <div className="p-6 flex flex-col flex-1">
         <div className="text-xs font-semibold text-muted-foreground mb-2 uppercase">

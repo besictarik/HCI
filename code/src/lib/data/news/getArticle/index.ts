@@ -1,23 +1,12 @@
 import { getPayload } from "payload";
 import { unstable_cache } from "next/cache";
 import config from "@/payload.config";
+import type { Article as PayloadArticle } from "@/payload-types";
 import { Article } from "@/lib/data/news/types";
 import { formatArticleDate, lexicalToText, resolveMediaUrl } from "../helpers";
 
-type ArticleDoc = {
-  id: number | string;
-  slug?: string | null;
-  title?: string | null;
-  category?: string | null;
-  excerpt?: string | null;
-  authorName?: string | null;
-  publishedAt?: string | null;
-  content?: unknown;
-  coverImage?: unknown;
-};
-
 const queryArticle = async (slug: string): Promise<Article | null> => {
-  const payload = (await getPayload({ config: await config })) as any;
+  const payload = await getPayload({ config: await config });
 
   const { docs } = await payload.find({
     collection: "articles",
@@ -39,7 +28,7 @@ const queryArticle = async (slug: string): Promise<Article | null> => {
     depth: 1,
   });
 
-  const article = (docs as ArticleDoc[])[0];
+  const article = (docs as PayloadArticle[])[0];
 
   if (!article) {
     return null;

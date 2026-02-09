@@ -2,8 +2,8 @@ import { getCourses } from "@/lib/data/courses";
 import Link from "next/link";
 import Card from "./Card";
 
-const CoursesGrid = () => {
-  const courses = getCourses().slice(0, 2);
+const CoursesGrid = async () => {
+  const courses = (await getCourses()).slice(0, 2);
   return (
     <section className="py-12 md:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

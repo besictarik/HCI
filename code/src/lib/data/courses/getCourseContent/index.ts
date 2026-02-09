@@ -1,76 +1,71 @@
-export const getCourseContent = () => {
+import { getPayload } from "payload";
+import config from "@/payload.config";
+import { CourseContent } from "@/lib/data/courses/types";
+
+type LessonDoc = {
+  title?: string | null;
+  duration?: string | null;
+  description?: string | null;
+  completed?: boolean | null;
+};
+
+type ModuleDoc = {
+  title?: string | null;
+  lessons?: LessonDoc[] | null;
+};
+
+type CourseDoc = {
+  id: number | string;
+  title?: string | null;
+  contentModules?: ModuleDoc[] | null;
+};
+
+export const getCourseContent = async (
+  slug: string
+): Promise<CourseContent | null> => {
+  const payload = await getPayload({ config: await config });
+
+  const { docs } = await payload.find({
+    collection: "courses",
+    where: {
+      and: [
+        {
+          slug: {
+            equals: slug,
+          },
+        },
+        {
+          status: {
+            equals: "published",
+          },
+        },
+      ],
+    },
+    limit: 1,
+    depth: 0,
+  });
+
+  const course = (docs as CourseDoc[])[0];
+
+  if (!course) {
+    return null;
+  }
+
+  const modules = (course.contentModules || []).map((module, moduleIndex) => ({
+    id: moduleIndex + 1,
+    title: module.title || `Module ${moduleIndex + 1}`,
+    lessons: (module.lessons || []).map((lesson, lessonIndex) => ({
+      id: `m${moduleIndex + 1}-l${lessonIndex + 1}`,
+      title: lesson.title || `Lesson ${lessonIndex + 1}`,
+      duration: lesson.duration || "N/A",
+      description: lesson.description || "",
+      completed: Boolean(lesson.completed),
+    })),
+  }));
+
   return {
-    id: 1,
-    title: "Web Development Fundamentals",
-    modules: [
-      {
-        id: 1,
-        title: "Getting Started",
-        lessons: [
-          {
-            id: 1,
-            title: "Welcome to the Course",
-            duration: "5 min",
-            completed: true,
-          },
-          {
-            id: 2,
-            title: "Setting Up Your Environment",
-            duration: "15 min",
-            completed: true,
-          },
-          {
-            id: 3,
-            title: "Course Overview",
-            duration: "10 min",
-            completed: false,
-          },
-        ],
-      },
-      {
-        id: 2,
-        title: "HTML Fundamentals",
-        lessons: [
-          { id: 4, title: "HTML Basics", duration: "20 min", completed: true },
-          {
-            id: 5,
-            title: "Semantic HTML",
-            duration: "18 min",
-            completed: true,
-          },
-          {
-            id: 6,
-            title: "Forms and Input",
-            duration: "22 min",
-            completed: false,
-          },
-          {
-            id: 7,
-            title: "HTML Project",
-            duration: "45 min",
-            completed: false,
-          },
-        ],
-      },
-      {
-        id: 3,
-        title: "CSS Styling",
-        lessons: [
-          {
-            id: 8,
-            title: "CSS Selectors",
-            duration: "20 min",
-            completed: false,
-          },
-          { id: 9, title: "Box Model", duration: "25 min", completed: false },
-          {
-            id: 10,
-            title: "Flexbox Layout",
-            duration: "30 min",
-            completed: false,
-          },
-        ],
-      },
-    ],
+    id: course.id,
+    title: course.title || "Untitled Course",
+    modules,
   };
 };

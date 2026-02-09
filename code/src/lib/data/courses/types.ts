@@ -1,5 +1,6 @@
 export type CoursePreview = {
-  id: number;
+  id: number | string;
+  slug: string;
   title: string;
   category: string;
   instructor: string;
@@ -9,10 +10,11 @@ export type CoursePreview = {
   description: string;
   level: string;
   duration: string;
+  imageUrl?: string;
 };
 
 export type Course = {
-  id: number;
+  id: number | string;
   slug: string;
   title: string;
   category: string;
@@ -28,12 +30,14 @@ export type Course = {
   duration: string;
   prerequisites: string;
   learnings: string[];
+  imageUrl?: string;
 };
 
 type Lesson = {
-  id: number;
+  id: string;
   title: string;
   duration: string;
+  description: string;
   completed: boolean;
 };
 
@@ -44,7 +48,7 @@ type Module = {
 };
 
 export type CourseContent = {
-  id: number;
+  id: number | string;
   title: string;
   modules: Module[];
 };

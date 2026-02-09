@@ -1,28 +1,89 @@
-export const getCourse = () => {
+import { getPayload } from "payload";
+import config from "@/payload.config";
+import { Course } from "@/lib/data/courses/types";
+
+type Learning = {
+  value?: string | null;
+};
+
+type CourseDoc = {
+  id: number | string;
+  slug?: string | null;
+  title?: string | null;
+  category?: string | null;
+  instructor?: string | null;
+  instructorBio?: string | null;
+  price?: number | null;
+  rating?: number | null;
+  students?: number | null;
+  reviews?: number | null;
+  description?: string | null;
+  fullDescription?: string | null;
+  level?: string | null;
+  duration?: string | null;
+  prerequisites?: string | null;
+  learnings?: Learning[] | null;
+  coverImage?: unknown;
+};
+
+const resolveMediaUrl = (value: unknown) => {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+
+  const url = (value as { url?: string }).url;
+  return typeof url === "string" && url.length > 0 ? url : undefined;
+};
+
+export const getCourse = async (slug: string): Promise<Course | null> => {
+  const payload = await getPayload({ config: await config });
+
+  const { docs } = await payload.find({
+    collection: "courses",
+    where: {
+      and: [
+        {
+          slug: {
+            equals: slug,
+          },
+        },
+        {
+          status: {
+            equals: "published",
+          },
+        },
+      ],
+    },
+    limit: 1,
+    depth: 1,
+  });
+
+  const course = (docs as CourseDoc[])[0];
+
+  if (!course) {
+    return null;
+  }
+
   return {
-    id: 1,
-    slug: "web-development-fundamentals",
-    title: "Web Development Fundamentals",
-    category: "Web Development",
-    instructor: "John Smith",
-    instructorBio:
-      "John is a full-stack developer with 10+ years of experience in building web applications.",
-    price: 49,
-    rating: 4.8,
-    students: 2500,
-    reviews: 450,
-    description:
-      "Master the essential skills needed to build modern web applications with hands-on projects.",
-    fullDescription:
-      "This comprehensive course covers HTML, CSS, JavaScript basics, and how to build responsive web applications. Through hands-on projects, you'll learn industry best practices and create a portfolio of real-world applications.",
-    level: "Beginner",
-    duration: "8 weeks",
-    prerequisites: "Basic computer knowledge",
-    learnings: [
-      "Build responsive websites with HTML5 and CSS3",
-      "Master JavaScript fundamentals and DOM manipulation",
-      "Create interactive web applications",
-      "Deploy applications to the web",
-    ],
+    id: course.id,
+    slug: course.slug || String(course.id),
+    title: course.title || "Untitled Course",
+    category: course.category || "General",
+    instructor: course.instructor || "Scholia Team",
+    instructorBio: course.instructorBio || "",
+    price: course.price ?? 0,
+    rating: course.rating ?? 0,
+    students: course.students ?? 0,
+    reviews: course.reviews ?? 0,
+    description: course.description || "",
+    fullDescription: course.fullDescription || "",
+    level: course.level || "Beginner",
+    duration: course.duration || "N/A",
+    prerequisites: course.prerequisites || "",
+    learnings:
+      course.learnings
+        ?.map((item) => item.value)
+        .filter((value): value is string => Boolean(value)) || [],
+    imageUrl: resolveMediaUrl(course.coverImage),
   };
 };

@@ -10,6 +10,9 @@ import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
 import { Customers } from "./collections/Customers";
 import { Articles } from "./collections/Articles";
+import { Courses } from "./collections/Courses";
+import { Enrollments } from "./collections/Enrollments";
+import { LessonProgress } from "./collections/LessonProgress";
 import { Home } from "./globals/Home";
 
 const filename = fileURLToPath(import.meta.url);
@@ -22,7 +25,15 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Customers, Media, Articles],
+  collections: [
+    Users,
+    Customers,
+    Media,
+    Articles,
+    Courses,
+    Enrollments,
+    LessonProgress,
+  ],
   globals: [Home],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
