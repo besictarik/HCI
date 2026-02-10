@@ -24,6 +24,10 @@ export const metadata: Metadata = {
   title: "Scholia",
   description:
     "Scholia is a premium, Next.js-powered learning platform offering a curated library of short, project-based courses created and owned by our team.",
+  icons: {
+    icon: "/scholia-favicon.svg",
+    shortcut: "/scholia-favicon.svg",
+  },
 };
 
 export default function RootLayout({
