@@ -1,7 +1,7 @@
 import { getPayload } from "payload";
 import { unstable_cache } from "next/cache";
 import config from "@/payload.config";
-import { CourseFilters, CoursePreview } from "@/lib/data/courses/types";
+import { CourseFilters, PaginatedCourses } from "@/lib/data/courses/types";
 
 type CourseDoc = {
   id: number | string;
@@ -33,10 +33,20 @@ const normalizeTextFilter = (value?: string) => {
   return normalized ? normalized : undefined;
 };
 
-const queryCourses = async (filters: CourseFilters = {}): Promise<CoursePreview[]> => {
+const normalizePositiveNumber = (value: number | undefined, fallback: number) => {
+  if (!value || Number.isNaN(value)) {
+    return fallback;
+  }
+
+  return value > 0 ? Math.floor(value) : fallback;
+};
+
+const queryCourses = async (filters: CourseFilters = {}): Promise<PaginatedCourses> => {
   const payload = await getPayload({ config: await config });
   const q = normalizeTextFilter(filters.q);
   const category = normalizeTextFilter(filters.category);
+  const page = normalizePositiveNumber(filters.page, 1);
+  const limit = normalizePositiveNumber(filters.limit, 9);
   const andConditions: Array<Record<string, unknown>> = [
     {
       status: {
@@ -75,17 +85,18 @@ const queryCourses = async (filters: CourseFilters = {}): Promise<CoursePreview[
     });
   }
 
-  const { docs } = await payload.find({
+  const result = await payload.find({
     collection: "courses",
     where: {
       and: andConditions as never[],
     },
     sort: "title",
-    limit: 100,
+    page,
+    limit,
     depth: 1,
   });
 
-  return (docs as CourseDoc[]).map((course) => ({
+  const mappedDocs = (result.docs as CourseDoc[]).map((course) => ({
     id: course.id,
     slug: course.slug || String(course.id),
     title: course.title || "Untitled Course",
@@ -99,15 +110,26 @@ const queryCourses = async (filters: CourseFilters = {}): Promise<CoursePreview[
     duration: course.duration || "N/A",
     imageUrl: resolveMediaUrl(course.coverImage),
   }));
+
+  return {
+    docs: mappedDocs,
+    page: result.page || page,
+    totalPages: result.totalPages || 1,
+    totalDocs: result.totalDocs || 0,
+    hasPrevPage: Boolean(result.hasPrevPage),
+    hasNextPage: Boolean(result.hasNextPage),
+  };
 };
 
-export const getCourses = async (filters: CourseFilters = {}): Promise<CoursePreview[]> => {
+export const getCourses = async (filters: CourseFilters = {}): Promise<PaginatedCourses> => {
   const q = normalizeTextFilter(filters.q) || "";
   const category = normalizeTextFilter(filters.category) || "";
+  const page = normalizePositiveNumber(filters.page, 1);
+  const limit = normalizePositiveNumber(filters.limit, 9);
 
   const getCoursesCached = unstable_cache(
-    () => queryCourses({ q, category }),
-    [`courses:list:${q}:${category}`],
+    () => queryCourses({ q, category, page, limit }),
+    [`courses:list:${q}:${category}:${page}:${limit}`],
     {
       tags: ["courses"],
     }

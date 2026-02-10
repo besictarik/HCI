@@ -20,6 +20,17 @@ export type CoursePreview = {
 export type CourseFilters = {
   q?: string;
   category?: string;
+  page?: number;
+  limit?: number;
+};
+
+export type PaginatedCourses = {
+  docs: CoursePreview[];
+  page: number;
+  totalPages: number;
+  totalDocs: number;
+  hasPrevPage: boolean;
+  hasNextPage: boolean;
 };
 
 export type Course = {

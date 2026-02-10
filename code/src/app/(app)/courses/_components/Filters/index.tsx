@@ -40,6 +40,8 @@ const Filters = ({ optionsPromise }: FiltersProps) => {
       params.delete("category");
     }
 
+    params.delete("page");
+
     startTransition(() => {
       setOptimisticFilters(next);
       const query = params.toString();
