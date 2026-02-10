@@ -1,19 +1,16 @@
 import Hero from "./_components/Hero";
-import { headers as getHeaders } from "next/headers";
-import { getPayload } from "payload";
-import config from "@/payload.config";
-import { getCourse, getCourseContent } from "@/lib/data/courses";
-import { hasCourseEnrollment } from "@/lib/data/enrollments";
+import { getCourse, getCourseContent, getPublishedCourseSlugs } from "@/lib/data/courses";
 import { notFound } from "next/navigation";
+
+export const dynamicParams = true;
+
+export const generateStaticParams = async () => {
+  const slugs = await getPublishedCourseSlugs();
+  return slugs.map((slug) => ({ slug }));
+};
 
 const Page = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
-  const headers = await getHeaders();
-  const payload = await getPayload({ config: await config });
-  const { user } = await payload.auth({ headers });
-  const isCustomer =
-    (user as { collection?: string; id?: number | string } | null)?.collection ===
-    "customers";
   const course = await getCourse(slug);
   const courseContent = await getCourseContent(slug);
 
@@ -21,14 +18,6 @@ const Page = async ({ params }: { params: Promise<{ slug: string }> }) => {
     notFound();
   }
 
-  const isEnrolled =
-    isCustomer && user?.id
-      ? await hasCourseEnrollment({
-          customerId: user.id,
-          courseId: course.id,
-          payload,
-        })
-      : false;
   const totalLessons =
     courseContent?.modules.reduce(
       (lessonCount, module) => lessonCount + module.lessons.length,
@@ -37,7 +26,7 @@ const Page = async ({ params }: { params: Promise<{ slug: string }> }) => {
 
   return (
     <>
-      <Hero course={course} isCustomer={isCustomer} isEnrolled={isEnrolled} />
+      <Hero course={course} />
       <section className="py-10 md:py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-8">

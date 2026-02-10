@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 import { authenticated } from "@/access";
 import { revalidateTag } from "next/cache";
+import { getCourseAccessHandler } from "./_endpoints";
 
 const slugify = (value: string) =>
   value
@@ -11,6 +12,13 @@ const slugify = (value: string) =>
 
 export const Courses: CollectionConfig = {
   slug: "courses",
+  endpoints: [
+    {
+      path: "/access",
+      method: "get",
+      handler: getCourseAccessHandler,
+    },
+  ],
   access: {
     admin: authenticated,
     create: authenticated,

@@ -1,24 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
+import { Suspense } from "react";
 import { Course } from "@/lib/data/courses/types";
-import { Button } from "@/ui/button";
-import { acquireCourseAction } from "../../actions";
+import CourseActions from "./CourseActions";
+import CourseActionsSkeleton from "./CourseActions/skeleton";
 
 type HeroProps = {
   course: Course;
-  isCustomer: boolean;
-  isEnrolled: boolean;
 };
 
-const Hero = ({ course, isCustomer, isEnrolled }: HeroProps) => {
-  const loginHref = `/login?redirect=${encodeURIComponent(`/course/${course.slug}`)}`;
-  const acquireCourseForSlug = acquireCourseAction.bind(
-    null,
-    course.id,
-    course.slug
-  );
-
+const Hero = ({ course }: HeroProps) => {
   return (
     <section className="py-12 md:py-16 bg-gradient-to-br from-primary/10 to-accent/10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid gap-8 lg:grid-cols-2 lg:items-start">
@@ -48,26 +40,9 @@ const Hero = ({ course, isCustomer, isEnrolled }: HeroProps) => {
             </div>
           </div>
           <p className="text-xl font-bold text-foreground mb-6">${course.price}</p>
-          <div className="flex items-center gap-3 flex-wrap">
-            {isEnrolled ? (
-              <Button asChild size="lg">
-                <Link href={`/course/${course.slug}/learn`}>Continue Learning</Link>
-              </Button>
-            ) : isCustomer ? (
-              <form action={acquireCourseForSlug}>
-                <Button size="lg" type="submit">
-                  Acquire Course
-                </Button>
-              </form>
-            ) : (
-              <Button asChild size="lg">
-                <Link href={loginHref}>Sign In to Acquire</Link>
-              </Button>
-            )}
-            <Button asChild size="lg" variant="outline">
-              <Link href="/courses">Browse Courses</Link>
-            </Button>
-          </div>
+          <Suspense fallback={<CourseActionsSkeleton />}>
+            <CourseActions courseId={course.id} courseSlug={course.slug} />
+          </Suspense>
         </div>
         <div className="relative min-h-64 h-full rounded-lg border border-border overflow-hidden bg-card">
           {course.imageUrl ? (
