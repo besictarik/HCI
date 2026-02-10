@@ -16,30 +16,36 @@ const TopBarProgress = ({
   }));
 
   return (
-    <div className="w-44 hidden sm:block">
-      <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-        <span>Progress</span>
-        <span>
-          {completedCount}/{totalLessons}
-        </span>
+    <>
+      <div className="sm:hidden text-xs font-medium text-muted-foreground">
+        {completedCount}/{totalLessons}
       </div>
-      <div
-        className="grid gap-1"
-        style={{
-          gridTemplateColumns: `repeat(${Math.max(totalLessons, 1)}, minmax(0, 1fr))`,
-        }}
-        aria-label={`Course progress ${progressPercent}%`}
-      >
-        {segments.map((segment) => (
-          <span
-            key={segment.key}
-            className={`h-1.5 rounded-full transition-colors ${
-              segment.completed ? "bg-black" : "bg-muted"
-            }`}
-          />
-        ))}
+
+      <div className="hidden w-44 sm:block">
+        <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+          <span>Progress</span>
+          <span>
+            {completedCount}/{totalLessons}
+          </span>
+        </div>
+        <div
+          className="grid gap-1"
+          style={{
+            gridTemplateColumns: `repeat(${Math.max(totalLessons, 1)}, minmax(0, 1fr))`,
+          }}
+          aria-label={`Course progress ${progressPercent}%`}
+        >
+          {segments.map((segment) => (
+            <span
+              key={segment.key}
+              className={`h-1.5 rounded-full transition-colors ${
+                segment.completed ? "bg-black" : "bg-muted"
+              }`}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

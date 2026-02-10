@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import LessonContentPanel from "./_components/LessonContentPanel";
 import LessonContentSkeleton from "./_components/LessonContentSkeleton";
 import TopBarProgress from "./_components/TopBarProgress";
+import LessonsMenuButton from "./_components/LessonsMenuButton";
 import { notFound } from "next/navigation";
 
 const Page = async ({
@@ -69,7 +70,8 @@ const Page = async ({
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <div className="h-16 border-b border-border flex items-center px-4 gap-4 bg-background">
+        <div className="h-16 border-b border-border flex items-center gap-3 bg-background px-4 md:gap-4">
+          <LessonsMenuButton />
           <div className="flex-1 min-w-0">
             <div>
               <p className="text-xs text-muted-foreground">{course.title}</p>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import AuthControls from "./AuthControls";
 import AuthControlsSkeleton from "./AuthControls/skeleton";
+import MobileMenu from "./MobileMenu";
 import NavLinks from "./NavLinks";
 
 const Navbar = () => {
@@ -27,6 +28,10 @@ const Navbar = () => {
               <AuthControls />
             </Suspense>
           </nav>
+
+          <Suspense fallback={null}>
+            <MobileMenu />
+          </Suspense>
         </div>
       </div>
     </nav>
