@@ -11,6 +11,15 @@ export type CoursePreview = {
   level: string;
   duration: string;
   imageUrl?: string;
+  progress?: {
+    completedLessons: number;
+    totalLessons: number;
+  };
+};
+
+export type CourseFilters = {
+  q?: string;
+  category?: string;
 };
 
 export type Course = {

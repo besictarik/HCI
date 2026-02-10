@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { CourseContent } from "@/lib/data/courses/types";
 import { toggleLessonProgressAction } from "../../actions";
 import LessonProgressToggle from "../LessonProgressToggle";
+import { Button } from "@/ui/button";
 import { notFound } from "next/navigation";
 
 type LessonContentPanelProps = {
@@ -30,6 +32,12 @@ const LessonContentPanel = ({
   const selectedModule = courseContent.modules.find((module) =>
     module.lessons.some((lesson) => lesson.id === selectedLesson.id)
   );
+  const currentIndex = lessons.findIndex((lesson) => lesson.id === selectedLesson.id);
+  const previousLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null;
+  const nextLesson =
+    currentIndex >= 0 && currentIndex < lessons.length - 1
+      ? lessons[currentIndex + 1]
+      : null;
   const completedSet = new Set(completedLessonIds);
   const isSelectedLessonCompleted = completedSet.has(selectedLesson.id);
   const markLessonComplete = toggleLessonProgressAction.bind(null, {
@@ -70,6 +78,31 @@ const LessonContentPanel = ({
           markCompleteAction={markLessonComplete}
           markIncompleteAction={markLessonIncomplete}
         />
+        <div className="flex items-center justify-between gap-3 pt-2">
+          {previousLesson ? (
+            <Button asChild variant="outline">
+              <Link
+                href={`/course/${courseSlug}/learn?lesson=${encodeURIComponent(previousLesson.id)}`}
+              >
+                Previous Lesson
+              </Link>
+            </Button>
+          ) : (
+            <div />
+          )}
+
+          {nextLesson ? (
+            <Button asChild>
+              <Link
+                href={`/course/${courseSlug}/learn?lesson=${encodeURIComponent(nextLesson.id)}`}
+              >
+                Next Lesson
+              </Link>
+            </Button>
+          ) : (
+            <div />
+          )}
+        </div>
       </div>
     </div>
   );

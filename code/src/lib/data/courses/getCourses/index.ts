@@ -1,6 +1,7 @@
 import { getPayload } from "payload";
+import { unstable_cache } from "next/cache";
 import config from "@/payload.config";
-import { CoursePreview } from "@/lib/data/courses/types";
+import { CourseFilters, CoursePreview } from "@/lib/data/courses/types";
 
 type CourseDoc = {
   id: number | string;
@@ -27,15 +28,57 @@ const resolveMediaUrl = (value: unknown) => {
   return typeof url === "string" && url.length > 0 ? url : undefined;
 };
 
-export const getCourses = async (): Promise<CoursePreview[]> => {
+const normalizeTextFilter = (value?: string) => {
+  const normalized = value?.trim();
+  return normalized ? normalized : undefined;
+};
+
+const queryCourses = async (filters: CourseFilters = {}): Promise<CoursePreview[]> => {
   const payload = await getPayload({ config: await config });
+  const q = normalizeTextFilter(filters.q);
+  const category = normalizeTextFilter(filters.category);
+  const andConditions: Array<Record<string, unknown>> = [
+    {
+      status: {
+        equals: "published",
+      },
+    },
+  ];
+
+  if (category) {
+    andConditions.push({
+      category: {
+        equals: category,
+      },
+    });
+  }
+
+  if (q) {
+    andConditions.push({
+      or: [
+        {
+          title: {
+            contains: q,
+          },
+        },
+        {
+          description: {
+            contains: q,
+          },
+        },
+        {
+          instructor: {
+            contains: q,
+          },
+        },
+      ],
+    });
+  }
 
   const { docs } = await payload.find({
     collection: "courses",
     where: {
-      status: {
-        equals: "published",
-      },
+      and: andConditions as never[],
     },
     sort: "title",
     limit: 100,
@@ -56,4 +99,19 @@ export const getCourses = async (): Promise<CoursePreview[]> => {
     duration: course.duration || "N/A",
     imageUrl: resolveMediaUrl(course.coverImage),
   }));
+};
+
+export const getCourses = async (filters: CourseFilters = {}): Promise<CoursePreview[]> => {
+  const q = normalizeTextFilter(filters.q) || "";
+  const category = normalizeTextFilter(filters.category) || "";
+
+  const getCoursesCached = unstable_cache(
+    () => queryCourses({ q, category }),
+    [`courses:list:${q}:${category}`],
+    {
+      tags: ["courses"],
+    }
+  );
+
+  return getCoursesCached();
 };

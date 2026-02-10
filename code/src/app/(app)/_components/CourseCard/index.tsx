@@ -2,6 +2,11 @@ import { CoursePreview } from "@/lib/data/courses/types";
 import Image from "next/image";
 
 const CourseCard = ({ course }: { course: CoursePreview }) => {
+  const completedLessons = course.progress?.completedLessons ?? 0;
+  const totalLessons = course.progress?.totalLessons ?? 0;
+  const progressPercent =
+    totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+
   return (
     <div className="group rounded-lg border border-border bg-card h-full hover:shadow-lg transition-all duration-300 hover:border-primary overflow-hidden flex flex-col">
       <div className="h-48 relative bg-muted flex items-center justify-center text-muted-foreground">
@@ -43,6 +48,22 @@ const CourseCard = ({ course }: { course: CoursePreview }) => {
               ${course.price}
             </div>
           </div>
+          {totalLessons > 0 ? (
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>
+                  {completedLessons}/{totalLessons} lessons
+                </span>
+                <span>{progressPercent}%</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full bg-foreground transition-all"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

@@ -15,10 +15,37 @@ type CourseDoc = {
   level?: string | null;
   duration?: string | null;
   coverImage?: unknown;
+  contentModules?: Array<{
+    lessons?: Array<unknown> | null;
+  }> | null;
 };
 
 type EnrollmentDoc = {
   course?: number | string | CourseDoc | null;
+};
+
+type LessonProgressDoc = {
+  course?: number | string | { id?: number | string } | null;
+};
+
+const getRelationId = (value: unknown): number | string | null => {
+  if (typeof value === "number" || typeof value === "string") {
+    return value;
+  }
+
+  if (value && typeof value === "object") {
+    const id = (value as { id?: unknown }).id;
+    if (typeof id === "number" || typeof id === "string") {
+      return id;
+    }
+  }
+
+  return null;
+};
+
+const getTotalLessons = (course: CourseDoc) => {
+  const modules = course.contentModules || [];
+  return modules.reduce((count, module) => count + (module.lessons?.length || 0), 0);
 };
 
 const resolveMediaUrl = (value: unknown) => {
@@ -45,36 +72,57 @@ const toCoursePreview = (course: CourseDoc): CoursePreview => ({
   imageUrl: resolveMediaUrl(course.coverImage),
 });
 
-export const getEnrolledCourses = async (
-  customerId: number | string
-): Promise<CoursePreview[]> => {
+export const getEnrolledCourses = async (customerId: number | string): Promise<CoursePreview[]> => {
   const payload = await getPayload({ config: await config });
 
-  const { docs } = await payload.find({
-    collection: "enrollments",
-    where: {
-      and: [
-        {
-          customer: {
-            equals: customerId,
+  const [{ docs: enrollmentDocs }, { docs: progressDocs }] = await Promise.all([
+    payload.find({
+      collection: "enrollments",
+      where: {
+        and: [
+          {
+            customer: {
+              equals: customerId,
+            },
           },
-        },
-        {
-          status: {
-            equals: "active",
+          {
+            status: {
+              equals: "active",
+            },
           },
+        ],
+      },
+      sort: "-acquiredAt",
+      limit: 100,
+      depth: 2,
+    }),
+    payload.find({
+      collection: "lesson-progress",
+      where: {
+        customer: {
+          equals: customerId,
         },
-      ],
-    },
-    sort: "-acquiredAt",
-    limit: 100,
-    depth: 2,
-  });
+      },
+      limit: 2000,
+      depth: 0,
+    }),
+  ]);
+
+  const completedByCourse = new Map<string, number>();
+  for (const item of progressDocs as LessonProgressDoc[]) {
+    const courseId = getRelationId(item.course);
+    if (!courseId) {
+      continue;
+    }
+
+    const key = String(courseId);
+    completedByCourse.set(key, (completedByCourse.get(key) || 0) + 1);
+  }
 
   const seen = new Set<string>();
   const courses: CoursePreview[] = [];
 
-  for (const enrollment of docs as EnrollmentDoc[]) {
+  for (const enrollment of enrollmentDocs as EnrollmentDoc[]) {
     const relation = enrollment.course;
 
     if (!relation || typeof relation !== "object") {
@@ -89,7 +137,15 @@ export const getEnrolledCourses = async (
     }
 
     seen.add(dedupeKey);
-    courses.push(toCoursePreview(course));
+    const totalLessons = getTotalLessons(course);
+    const completedLessons = completedByCourse.get(dedupeKey) || 0;
+    courses.push({
+      ...toCoursePreview(course),
+      progress: {
+        completedLessons: Math.min(completedLessons, totalLessons),
+        totalLessons,
+      },
+    });
   }
 
   return courses;
